@@ -78,6 +78,7 @@ def display_main_menu():
     high_score_text = menu_font.render(f'High Score: {high_score}', True, (255, 255, 255))
     settings_text = menu_font.render('Settings', True, (255, 255, 255))
     quit_text = menu_font.render('Quit', True, (255, 255, 255))
+    
     screen.blit(start_text, (screen.get_width() // 2 - 100, screen.get_height() // 2 - 150))
     screen.blit(high_score_text, (screen.get_width() // 2 - 150, screen.get_height() // 2 - 50))
     screen.blit(settings_text, (screen.get_width() // 2 - 100, screen.get_height() // 2 + 50))
