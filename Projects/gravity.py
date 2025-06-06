@@ -24,14 +24,14 @@ FPS = 60
 
 # Classes
 class Particle:
-    def __init__(self, x, y, mass, color):
+    def __init__(self, x, y, mass, color, vx, vy):
         self.x = x
         self.y = y
         self.mass = mass
         self.radius = mass // 3
         self.color = color
-        self.vx = 0
-        self.vy = 0
+        self.vx = vx
+        self.vy = vx
 
     def apply_force(self, fx, fy):
         """Apply a force to the particle (changes velocity)."""
@@ -40,7 +40,7 @@ class Particle:
         self.vx += ax
         self.vy += ay
 
-    def update(self):
+    def update(self, particles):
         """Update the particle's position and handle wall collisions."""
         self.x += self.vx
         self.y += self.vy
@@ -52,6 +52,12 @@ class Particle:
         if self.y - self.radius < 0 or self.y + self.radius > HEIGHT:
             self.vy = -self.vy  # Reverse y-velocity
             self.y = max(self.radius, min(HEIGHT - self.radius, self.y))  # Keep inside bounds
+
+        for particle in particles:
+            if(particle.radius + self.radius >= pow(pow((self.x - particle.x),2) + pow((self.y - particle.y),2) , 1/2)):
+                particle.vy , self.vy = self.vy, particle.vy
+                particle.vx , self.vx = self.vx, particle.vx
+
 
     def draw(self, screen):
         """Draw the particle on the screen."""
@@ -99,12 +105,12 @@ def calculate_gravitational_force(p1, p2):
 
 # Initialize particles and buttons
 particles = []
-for _ in range(20):
-    x = random.randint(100, WIDTH - 100)
-    y = random.randint(100, HEIGHT - 100)
-    mass = random.randint(55, 215)
-    color = random.choice([RED, BLUE, WHITE])
-    particles.append(Particle(x, y, mass, color))
+# for _ in range(20):
+#     x = random.randint(100, WIDTH - 100)
+#     y = random.randint(100, HEIGHT - 100)
+#     mass = random.randint(55, 215)
+#     color = random.choice([RED, BLUE, WHITE])
+#     particles.append(Particle(x, y, mass, color, x//10 , y//10))
 
 font = pygame.font.Font(None, 36)
 clear_button = Button(600, 20, 180, 40, "Clear Screen", font, GRAY, DARK_GRAY, lambda: particles.clear())
@@ -129,11 +135,11 @@ while running:
                 # Add particles based on mouse click
                 mx, my = pygame.mouse.get_pos()
                 if event.button == 1:  # Left click
-                    new_particle = Particle(mx, my, mass=100, color=RED)
+                    new_particle = Particle(mx, my, mass=100, color=RED, vx = 1,vy = 2)
                 elif event.button == 3:  # Right click
-                    new_particle = Particle(mx, my, mass=200, color=BLUE)
+                    new_particle = Particle(mx, my, mass=200, color=BLUE,  vx = 1,vy = 1)
                 elif event.button == 2: #middle click
-                    new_particle = Particle(mx, my, mass=150, color=WHITE)
+                    new_particle = Particle(mx, my, mass=150, color=WHITE, vx = 0.5,vy = 1.2)
                 particles.append(new_particle)
 
     # Calculate forces and update particles
@@ -148,7 +154,7 @@ while running:
 
     # Update and draw particles
     for particle in particles:
-        particle.update()
+        particle.update(particles)
         particle.draw(screen)
 
     pygame.display.flip()
